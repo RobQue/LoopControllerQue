@@ -61,7 +61,7 @@ void setup() {
   clock_prescale_set(clock_div_1);
 #endif
   // END of Trinket-specific code.
-  potFromPotSetup();
+  //potFromPotSetup();
   rad[0] = atan2(analogRead(A0) - 511, analogRead(A1) - 511) * precision / 3.14159265359;
   rad[1] = atan2(analogRead(A2) - 511, analogRead(A3) - 511) * precision / 3.14159265359;
   rad[2] = atan2(analogRead(A4) - 511, analogRead(A5) - 511) * precision / 3.14159265359;
