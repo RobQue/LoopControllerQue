@@ -5,20 +5,53 @@ void pitchBend(byte channel, int bit14Pitch)
   MidiUSB.flush(); // < important to send imediatelly
 }
 
+int receivePitchBend(byte channel)
+{
+  int pitchBendVal = 0;
+  byte usbmidiHeader = 0x0E; //pitch bend command
+  byte midiCh = 0xE0 | channel;
+  
+midiEventPacket_t rx;
+  do {
+    rx = MidiUSB.read();
+    if (rx.header != 0) {
+      
+      Serial.print("Received: ");
+      Serial.print(rx.header, HEX);
+      Serial.print("-");
+      Serial.print(rx.byte1, HEX);
+      Serial.print("-");
+      Serial.print(rx.byte2, HEX);
+      Serial.print("-");
+      Serial.println(rx.byte3, HEX);
+
+      if (rx.header == usbmidiHeader && rx.byte1 == midiCh)
+      {
+        pitchBendReceived = HIGH;
+        pitchBendVal = rx.byte3*128 + rx.byte2;
+      }
+      
+      Serial.println(pitchBendVal);
+    }
+  } while (rx.header != 0); 
+  
+return  pitchBendVal;
+}
+
 void receiveMIDI()
 {
 midiEventPacket_t rx;
   do {
     rx = MidiUSB.read();
     if (rx.header != 0) {
-//      Serial.print("Received: ");
-//      Serial.print(rx.header, HEX);
-//      Serial.print("-");
-//      Serial.print(rx.byte1, HEX);
-//      Serial.print("-");
-//      Serial.print(rx.byte2, HEX);
-//      Serial.print("-");
-//      Serial.println(rx.byte3, HEX);
+      Serial.print("Received: ");
+      Serial.print(rx.header, HEX);
+      Serial.print("-");
+      Serial.print(rx.byte1, HEX);
+      Serial.print("-");
+      Serial.print(rx.byte2, HEX);
+      Serial.print("-");
+      Serial.println(rx.byte3, HEX);
     }
   } while (rx.header != 0);
 }

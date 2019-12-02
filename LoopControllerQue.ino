@@ -32,6 +32,8 @@ float radstep[3];
 float relative[3] = {0.6, 0.6, 0.6};
 int precision = 180;
 float lastval;
+int receivedPitchBend;
+bool pitchBendReceived;
 
 unsigned long previousMillis = 0;        //FPS
 const long interval = 10;
@@ -69,7 +71,7 @@ void setup() {
   lastrad[2] = rad[2];
 
 
-  //Serial.begin(115200);
+  Serial.begin(115200);
 
   strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
   strip.show();            // Turn OFF all pixels ASAP
@@ -81,7 +83,9 @@ void setup() {
 
   void loop() {
 
-  receiveMIDI();
+  //receiveMIDI();
+  receivedPitchBend = receivePitchBend(0);
+  
   analogOne.update();
   analogTwo.update();
   //calculate radians
@@ -99,8 +103,19 @@ void setup() {
   if (radstep[0] >  300) radstep[0] =  radstep[0] - 360;
   if (radstep[0] < -300) radstep[0] =  radstep[0] + 360;
 
+  // get midi from usb and set it to current bufffer (override the relative) if it changed
+  if(pitchBendReceived)
+  {
+    float pbr = float(receivedPitchBend);
+    relative[0] = map (pbr, 0, 16383, -129, 139);
+    pitchBendReceived = LOW;
+  }
+  
+  
+  
   relative[0] = relative[0] + radstep[0];
   relative[0] = constrain(relative[0], -129, 139);
+  //Serial.print( relative[0] );
   //if ( relative[0] > 180.6 ) relative[0] = 180.6; //because of round
   //if ( relative[0] < -179.4 ) relative[0] = -179.4; //because of round to int
   float ralfine = relative[0]*1000;
@@ -115,10 +130,13 @@ void setup() {
    if (pitchb != lastval) // avoid sending repetative midi data
   {
   pitchBend(0, (int) pitchb );
+  Serial.println( relative[0] );
   //Serial.println ((int)pitchb);
   lastval = pitchb;
   }
   //}
+
+  
   
   //relative[0] = relative[0] * -1;
 
