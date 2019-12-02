@@ -110,8 +110,7 @@ void setup() {
     relative[0] = map (pbr, 0, 16383, -129, 139);
     pitchBendReceived = LOW;
   }
-  
-  
+   //pitchBendReceived = LOW;
   
   relative[0] = relative[0] + radstep[0];
   relative[0] = constrain(relative[0], -129, 139);
@@ -121,20 +120,22 @@ void setup() {
   float ralfine = relative[0]*1000;
   float pitchb = map(ralfine/10, -12900, 13900, 0, 16383);
 
-//  unsigned long currentMillis = millis();  //fps limit
-//  
-//  if (currentMillis - previousMillis >= interval) {
-//    // save the last time you blinked the LED
-//    previousMillis = currentMillis;
-//    
-   if (pitchb != lastval) // avoid sending repetative midi data
+  
+  unsigned long currentMillis = millis();  //fps limit
+  
+  if (currentMillis - previousMillis >= interval) 
   {
-  pitchBend(0, (int) pitchb );
-  Serial.println( relative[0] );
-  //Serial.println ((int)pitchb);
-  lastval = pitchb;
-  }
-  //}
+      // save the last time you blinked the LED
+    previousMillis = currentMillis;
+    
+     if (pitchb != lastval) // avoid sending repetative midi data
+     {
+        pitchBend(0, (int) pitchb );
+        //Serial.println( relative[0] );
+        //Serial.println ((int)pitchb);
+        lastval = pitchb;
+     }
+}
 
   
   

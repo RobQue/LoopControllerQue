@@ -12,7 +12,7 @@ Glitch low fps fixed with midi flush
 
 Still there is some delay perhabs because of computation either noise reduction or just transfer lag? 
 
-delay might be because of midi buffer overflow, so try to implement limited FPS for midi 
+[done] delay might be because of midi buffer overflow, so try to implement limited FPS for midi 
 
 
 

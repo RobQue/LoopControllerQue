@@ -16,14 +16,14 @@ midiEventPacket_t rx;
     rx = MidiUSB.read();
     if (rx.header != 0) {
       
-      Serial.print("Received: ");
-      Serial.print(rx.header, HEX);
-      Serial.print("-");
-      Serial.print(rx.byte1, HEX);
-      Serial.print("-");
-      Serial.print(rx.byte2, HEX);
-      Serial.print("-");
-      Serial.println(rx.byte3, HEX);
+//      Serial.print("Received: ");
+//      Serial.print(rx.header, HEX);
+//      Serial.print("-");
+//      Serial.print(rx.byte1, HEX);
+//      Serial.print("-");
+//      Serial.print(rx.byte2, HEX);
+//      Serial.print("-");
+//      Serial.println(rx.byte3, HEX);
 
       if (rx.header == usbmidiHeader && rx.byte1 == midiCh)
       {
@@ -31,7 +31,7 @@ midiEventPacket_t rx;
         pitchBendVal = rx.byte3*128 + rx.byte2;
       }
       
-      Serial.println(pitchBendVal);
+      //Serial.println(pitchBendVal);
     }
   } while (rx.header != 0); 
   
