@@ -1,38 +1,53 @@
-// include the ResponsiveAnalogRead library
-#include <ResponsiveAnalogRead.h>
-
-// make a ResponsiveAnalogRead objects, pass in the pins, and either true or false depending on if you want sleep enabled
-// enabling sleep will cause values to take less time to stop changing and potentially stop changing more abruptly,
-//   where as disabling sleep will cause values to ease into their correct position smoothly and more accurately
-
-ResponsiveAnalogRead analogOne(A0, true);
-ResponsiveAnalogRead analogTwo(A1, true);
-
-// the next optional argument is snapMultiplier, which is set to 0.01 by default
-// you can pass it a value from 0 to 1 that controls the amount of easing
-// increase this to lessen the amount of easing (such as 0.1) and make the responsive values more responsive
-// but doing so may cause more noise to seep through if sleep is not enabled
-
-int analogResolution = 1024;
-
-analogOne.setAnalogResolution(analogResolution);
 
 
-
-
-void analog360setup()
+void analog360initialize()
 {
-  analogOne.setAnalogResolution(analogResolution); 
+  for (int i = 0; i< analogObjectsQuantity ; i++)
+  {
+    analog[i].setAnalogResolution(analogResolution);
+  }
+  calculateRads();
+  
+  for (int i = 0; i< analogObjectsQuantity/2 ; i++)
+  {
+    lastrad[i] = rad[i];
+  }
+  
 }
 
 
+void analog360loop()
+{
+    
+}
 
 
+void calculateRads()
+{
+  for (int i = 0; i< analogObjectsQuantity ; i++)
+  {
+    analog[i].update();
+  }
+  
+  for (int i = 0; i< analogObjectsQuantity/2 ; i++)
+  {
+    rad[i] = atan2(analog[i*2].getValue() - analogResolution/2 - 1, analog[i*2+1].getValue() - analogResolution/2 - 1) * precision / 3.14159265359;
+  }
+  
+}
+
+void calculateRadsteps()
+{
+  for (int i = 0; i< analogObjectsQuantity/2 ; i++)
+  {
+    radstep[i] = lastrad[i] - rad[i];
+    if (radstep[i] >  300) radstep[i] =  radstep[i] - 360;  // this one is for looping
+    if (radstep[i] < -300) radstep[i] =  radstep[i] + 360;
+  }
+}
 
 
-
-
-
+    
 
 
 

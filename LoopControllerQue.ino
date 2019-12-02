@@ -1,3 +1,41 @@
+// include the ResponsiveAnalogRead library
+#include <ResponsiveAnalogRead.h>
+
+// make a ResponsiveAnalogRead objects, pass in the pins, and either true or false depending on if you want sleep enabled
+// enabling sleep will cause values to take less time to stop changing and potentially stop changing more abruptly,
+//   where as disabling sleep will cause values to ease into their correct position smoothly and more accurately
+
+bool analogSleep = true;
+ResponsiveAnalogRead analog[] = {
+  ResponsiveAnalogRead(A0, analogSleep),
+  ResponsiveAnalogRead(A1, analogSleep),
+  ResponsiveAnalogRead(A2, analogSleep),
+  ResponsiveAnalogRead(A3, analogSleep),
+  ResponsiveAnalogRead(A4, analogSleep),
+  ResponsiveAnalogRead(A5, analogSleep),
+  };
+
+//ResponsiveAnalogRead analogOne(A0, true);
+//ResponsiveAnalogRead analogTwo(A1, true);
+
+#define analogObjectsQuantity  sizeof(analog) / sizeof(analog[0])
+
+float rad[analogObjectsQuantity/2]; // because 2 analogs per pot
+float lastrad[analogObjectsQuantity/2];
+float radstep[analogObjectsQuantity/2];
+
+// the next optional argument is snapMultiplier, which is set to 0.01 by default
+// you can pass it a value from 0 to 1 that controls the amount of easing
+// increase this to lessen the amount of easing (such as 0.1) and make the responsive values more responsive
+// but doing so may cause more noise to seep through if sleep is not enabled
+
+int analogResolution = 1024;  // how many bits ADC
+
+int precision = 180; // Presision for degrees/
+
+//----------------------------------------------------------------------------------------------------------- ANALOG360 Variables
+
+
 // A basic everyday NeoPixel strip test program.
 
 
@@ -10,7 +48,7 @@
 // - When using a 3.3V microcontroller with a 5V-powered NeoPixel strip,
 //   a LOGIC-LEVEL CONVERTER on the data line is STRONGLY RECOMMENDED.
 // (Skipping these may work OK on your workbench but can fail in the field)
-#include <ResponsiveAnalogRead.h>
+
 #include "MIDIUSB.h"
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -26,11 +64,11 @@
 
 // Declare our NeoPixel strip object:
 int wait = 30;
-float rad[3];
-float lastrad[3];
-float radstep[3];
+//float rad[3];
+//float lastrad[3];
+//float radstep[3];
 float relative[3] = {0.6, 0.6, 0.6};
-int precision = 180;
+
 float lastval;
 int receivedPitchBend;
 bool pitchBendReceived;
@@ -38,8 +76,8 @@ bool pitchBendReceived;
 unsigned long previousMillis = 0;        //FPS
 const long interval = 10;
 
-ResponsiveAnalogRead analogOne(A0, true);
-ResponsiveAnalogRead analogTwo(A1, true);
+//ResponsiveAnalogRead analogOne(A0, true);
+//ResponsiveAnalogRead analogTwo(A1, true);
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 // Argument 1 = Number of pixels in NeoPixel strip
@@ -62,13 +100,8 @@ void setup() {
 #endif
   // END of Trinket-specific code.
   //potFromPotSetup();
-  rad[0] = atan2(analogRead(A0) - 511, analogRead(A1) - 511) * precision / 3.14159265359;
-  rad[1] = atan2(analogRead(A2) - 511, analogRead(A3) - 511) * precision / 3.14159265359;
-  rad[2] = atan2(analogRead(A4) - 511, analogRead(A5) - 511) * precision / 3.14159265359;
-  //make last radian same as current radian so relative starts from zero
-  lastrad[0] = rad[0];
-  lastrad[1] = rad[1];
-  lastrad[2] = rad[2];
+  
+  analog360initialize();
 
 
   Serial.begin(115200);
@@ -86,22 +119,8 @@ void setup() {
   //receiveMIDI();
   receivedPitchBend = receivePitchBend(0);
   
-  analogOne.update();
-  analogTwo.update();
-  //calculate radians
-  rad[0] = atan2(analogOne.getValue() - 511, analogTwo.getValue() - 511) * precision / 3.14159265359;
-    
-  //rad[0] = atan2(analogRead(A0) - 511, analogRead(A1) - 511) * precision / 3.14159265359;
-  rad[1] = atan2(analogRead(A2) - 511, analogRead(A3) - 511) * precision / 3.14159265359;
-  rad[2] = atan2(analogRead(A4) - 511, analogRead(A5) - 511) * precision / 3.14159265359;
-
-  
-  radstep[0] = lastrad[0] - rad[0];
-  radstep[1] = lastrad[1] - rad[1];
-  radstep[2] = lastrad[2] - rad[2];
-
-  if (radstep[0] >  300) radstep[0] =  radstep[0] - 360;
-  if (radstep[0] < -300) radstep[0] =  radstep[0] + 360;
+calculateRads();
+calculateRadsteps();
 
   // get midi from usb and set it to current bufffer (override the relative) if it changed
   if(pitchBendReceived)

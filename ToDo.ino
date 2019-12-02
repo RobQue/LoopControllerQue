@@ -1,6 +1,7 @@
 /*
 
-Jumping valur between 2 steps, noise reduction
+Implement: 
+values math updated only if analog values changed.
 
 [Done] Led phase mapping start end led
 
@@ -14,6 +15,8 @@ Still there is some delay perhabs because of computation either noise reduction 
 
 [done] delay might be because of midi buffer overflow, so try to implement limited FPS for midi 
 
+
+BUGS >>> if serial port opened and later closed, device is frozen, works only when serial is open again < this happends if serial print messages are used. so kinda need to monitor if serial is open then serial messages sent otherwise not.
 
 
 
